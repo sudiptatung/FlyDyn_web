@@ -1,0 +1,141 @@
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>FlyDyn in Python</title>
+
+    <!-- Bootstrap core CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
+</head>
+
+<body class="bg-light">
+<!-- Tab panes -->
+
+<div class="container">
+	<div class="py-5 text-center">
+		<h2>FlyDyn</h2>
+		<p class="lead">This program simulates how egg number and adult number vary across generations in single, isolated populations of common fruitfly <i> Drosophila melanogaster </i> using an individual-based, discrete generation, stochastic model. Model schematics can be found <a href ="https://doi.org/10.1016/j.jtbi.2018.10.019" target="_blank">here</a>. Adjust parameter values and observe corresponding change in egg and adult timeseries.</p>
+	</div>
+	<form id="flyndyn_form">
+		<div class="row">
+			<div class="col-md-3 mb-3">
+				<div class="form-group">
+					<label>Length of timeseries</label>
+					<input type="number" name="length_timeseries" class="form-control" value="100" min="10" max="500" step="10">
+				</div>
+			</div>
+			<div class="col-md-3 mb-3">
+				<div class="form-group">
+					<label>No. of populations</label>
+					<input type="number" name="no_populations" class="form-control" value="5" min="1" max="50" step="1">
+				</div>
+			</div>
+			<div class="col-md-3 mb-3">
+				<div class="form-group">
+					<label>Initial egg number</label>
+					<input type="number" name="starting_number" class="form-control" value="30" min="5" max="100" step="1">
+				</div>
+			</div>
+			<div class="col3">
+				<div class="form-group">
+					<br/>
+					<button class="btn btn-success btn-lg" type="submit" value="Plot"> Plot </button>
+				</div>
+			</div>
+			<div class="col">
+				<div class="form-group">
+					<br/>
+					<button class="btn btn-outline-secondary btn-lg" type="reset" value="Reset">Reset</button>
+				</div>
+			</div>
+		</div>
+		<h4 class="mb-3">Adjust parameter values</h4>
+		<div class="row">
+			<div class="col-md-6 mb-3">
+				<div class="form-group">
+					<label>Larval Food</label>
+					<input type="range" class="custom-range" name="larval_food" value="2.2" min="1.0" max="3.5" step=".01"/>
+				</div>
+			</div>
+			<div class="col-md-6 mb-3">
+				<div class="form-group">
+					<label>Adult food</label>
+					<input type="range" class="custom-range" name="adult_food" value="1.15" min="1.0" max="2.0" step=".01" />							
+				</div>
+			</div>
+		</div>
+		<div>
+			<br/>
+		</div>
+		<h4 class="mb-3"><small>More parameters</small></h4>
+		<div class="row">
+			<div class="col-md-4 mb-3">
+				<div class="form-group">
+					<label>Egg hatchability</label>
+					<input type="range" class="custom-range" name="hatchability" value="0.98" min="0.0" max="1.0" step=".01"/>
+				</div>
+			</div>
+			<div class="col-md-4 mb-3">
+				<div class="form-group">
+					<label>Larval critical mass</label>
+					<input type="range" class="custom-range" name="Mc" value="1.1" min="0.75" max="1.5" step=".01" />							
+				</div>
+			</div>
+			<div class="col-md-4 mb-3">
+				<div class="form-group">
+					<label>Proportion of males</label>
+					<input type="range" class="custom-range" name="sex_ratio" value="0.5" min="0.1" max="1.0" step=".01" />							
+				</div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-md-4 mb-3">
+				<div class="form-group">
+					<label>Female fecundity index</label>
+					<input type="range" class="custom-range" name="x5" value="85" min="5" max="150" step="1"/>
+				</div>
+			</div>
+			<div class="col-md-4 mb-3">
+				<div class="form-group">
+					<label>Sensitivity of female-fecundity to adult density</label>
+					<input type="range" class="custom-range" name="SenDen" value="0.17" min="0.12" max="0.22" step=".001" />							
+				</div>
+			</div>
+			<div class="col-md-4 mb-3">
+				<div class="form-group">
+					<label>Sensitivity of female-fecundity to body-size</label>
+					<input type="range" class="custom-range" name="SenSize" value="1.7" min="1.7" max="2.2" step=".01" />							
+				</div>
+			</div>
+		</div>				
+	</form>
+
+	<div class="text-center d-none" id="output">
+		<br/>
+		Images may take a while to load.. Please be patient...
+	</div>
+
+	<footer class="my-5 pt-5 text-muted text-center text-small">
+		<p class="mb-1">&copy; By Sudipta Tung</p>
+		<p class="mb-1">For any issues contact <b><i>sudiptatung@fas.harvard.edu</i></b></p>
+		<p class="mb-1">Thanks to Parameswaran Muthuramalingam for web integration of this simulation.</p>
+	</footer>
+</div>
+	
+
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script type="text/javascript">
+    $(document).ready(function () {
+        // Listen to submit event on the <form> itself!
+        $('#flyndyn_form').submit(function (e) {
+
+            e.preventDefault();
+            var form = document.forms.flyndyn_form;
+            var details = "Larval Food: " + form.larval_food.value +
+                ";  Adult food: " + form.adult_food.value;
+
+            $('#output').removeClass("d-none").show().prepend('<div><strong>' + details + '</strong><br/><img src="/plotImage?v=' + Math.random() + "&" + $("#flyndyn_form").serialize() + '" /></div><br/><hr/><br/>')
+        });
+    });
+</script>
+</body>
+</html>
