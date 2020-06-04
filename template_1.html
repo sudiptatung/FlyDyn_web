@@ -8,18 +8,17 @@
 </head>
 
 <body class="bg-light">
-<!-- Tab panes -->
-
 <div class="container">
 	<div class="py-5 text-center">
 		<h2>FlyDyn</h2>
-		<p class="lead">This program simulates how egg number and adult number vary across generations in single, isolated populations of common fruitfly <i> Drosophila melanogaster </i> using an individual-based, discrete generation, stochastic model. Model schematics can be found <a href ="https://doi.org/10.1016/j.jtbi.2018.10.019" target="_blank">here</a>. Adjust parameter values and observe corresponding change in egg and adult timeseries.</p>
+		<p class="lead">This program simulates how egg numbers and adult numbers vary across generations in single, isolated populations of common fruitfly <i> Drosophila melanogaster </i> using an individual-based, stage-structured, discrete generation model. A detailed description of the model can be found <a href ="https://doi.org/10.1016/j.jtbi.2018.10.019" target="_blank">here</a>. Click reset and refresh page to start afresh.</p>
+		
 	</div>
 	<form id="flyndyn_form">
 		<div class="row">
 			<div class="col-md-3 mb-3">
 				<div class="form-group">
-					<label>Length of timeseries</label>
+					<label>No. of generations</label>
 					<input type="number" name="length_timeseries" class="form-control" value="100" min="10" max="500" step="10">
 				</div>
 			</div>
@@ -48,62 +47,79 @@
 				</div>
 			</div>
 		</div>
-		<h4 class="mb-3">Adjust parameter values</h4>
+		<h4 class="mb-3">Choose a nutitional regime</h4>
+		<div>
+			<br/>
+		</div>
 		<div class="row">
 			<div class="col-md-6 mb-3">
 				<div class="form-group">
 					<label>Larval Food</label>
-					<input type="range" class="custom-range" name="larval_food" value="2.2" min="1.0" max="3.5" step=".01"/>
+					<input type="range" class="custom-range" name="larval_food" value="2.2" min="1.0" max="3.5" step="0.01" onchange="rangevalue.value=value"/>							
+					<output id="rangevalue">2.2</output>
 				</div>
 			</div>
 			<div class="col-md-6 mb-3">
 				<div class="form-group">
 					<label>Adult food</label>
-					<input type="range" class="custom-range" name="adult_food" value="1.15" min="1.0" max="2.0" step=".01" />							
+					<input type="range" class="custom-range" name="adult_food" value="1.15" min="1.0" max="2.0" step=".01" onchange="rangevalue_adnut.value=value"/>							
+					<output id="rangevalue_adnut">1.15</output>
 				</div>
 			</div>
 		</div>
 		<div>
 			<br/>
 		</div>
-		<h4 class="mb-3"><small>More parameters</small></h4>
+		<h4 class="mb-3"><small>Adjust more parameters</small></h4>
 		<div class="row">
 			<div class="col-md-4 mb-3">
 				<div class="form-group">
 					<label>Egg hatchability</label>
-					<input type="range" class="custom-range" name="hatchability" value="0.98" min="0.0" max="1.0" step=".01"/>
+					<br/>
+					<input type="range" class="custom-range" name="hatchability" value="0.98" min="0.0" max="1.0" step=".01" onchange="rangevalue_h.value=value"/>
+					<output id="rangevalue_h">0.98</output>
 				</div>
 			</div>
 			<div class="col-md-4 mb-3">
 				<div class="form-group">
 					<label>Larval critical mass</label>
-					<input type="range" class="custom-range" name="Mc" value="1.1" min="0.75" max="1.5" step=".01" />							
+					<br/>
+					<input type="range" class="custom-range" name="Mc" value="1.1" min="0.75" max="1.5" step=".01" onchange="rangevalue_mc.value=value"/>							
+					<output id="rangevalue_mc">1.1</output>
 				</div>
 			</div>
 			<div class="col-md-4 mb-3">
 				<div class="form-group">
 					<label>Proportion of males</label>
-					<input type="range" class="custom-range" name="sex_ratio" value="0.5" min="0.1" max="1.0" step=".01" />							
+					<br/>
+					<input type="range" class="custom-range" name="sex_ratio" value="0.5" min="0.1" max="1.0" step=".01" onchange="rangevalue_sr.value=value"/>
+					<output id="rangevalue_sr">0.5</output>
 				</div>
 			</div>
 		</div>
 		<div class="row">
 			<div class="col-md-4 mb-3">
 				<div class="form-group">
-					<label>Female fecundity index</label>
-					<input type="range" class="custom-range" name="x5" value="85" min="5" max="150" step="1"/>
+					<label>Size and density independent female fecundity index</label>
+					<br/>
+					<input type="range" class="custom-range" name="x5" value="85" min="5" max="150" step="1" onchange="rangevalue_x5.value=value"/>
+					<output id="rangevalue_x5">85</output>
 				</div>
 			</div>
 			<div class="col-md-4 mb-3">
 				<div class="form-group">
 					<label>Sensitivity of female-fecundity to adult density</label>
-					<input type="range" class="custom-range" name="SenDen" value="0.17" min="0.12" max="0.22" step=".001" />							
+					<br/>
+					<input type="range" class="custom-range" name="SenDen" value="0.17" min="0.12" max="0.22" step=".001" onchange="rangevalue_senden.value=value"/>							
+					<output id="rangevalue_senden">0.17</output>
 				</div>
 			</div>
 			<div class="col-md-4 mb-3">
 				<div class="form-group">
 					<label>Sensitivity of female-fecundity to body-size</label>
-					<input type="range" class="custom-range" name="SenSize" value="1.7" min="1.7" max="2.2" step=".01" />							
+					<br/>
+					<input type="range" class="custom-range" name="SenSize" value="1.7" min="1.2" max="2.2" step=".01" onchange="rangevalue_sensize.value=value"/>							
+					<output id="rangevalue_sensize">1.7</output>
 				</div>
 			</div>
 		</div>				
@@ -115,9 +131,9 @@
 	</div>
 
 	<footer class="my-5 pt-5 text-muted text-center text-small">
-		<p class="mb-1">&copy; By Sudipta Tung</p>
-		<p class="mb-1">For any issues contact <b><i>sudiptatung@fas.harvard.edu</i></b></p>
-		<p class="mb-1">Thanks to Parameswaran Muthuramalingam for web integration of this simulation.</p>
+		<p class="mb-1">Content of this page is under <a href = "https://opensource.org/licenses/MIT">the MIT license </a>.</p>
+		<p class="mb-1">For any query or issues contact <b><i>sudiptatung@fas.harvard.edu</i></b></p>
+		<p class="mb-1">Thanks to Parameswaran Muthuramalingam for helping in web integration of this simulation.</p>
 	</footer>
 </div>
 	
