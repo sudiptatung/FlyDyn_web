@@ -1,7 +1,7 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>FlyDyn in Python</title>
+    <title>FlyDyn - Home</title>
 
     <!-- Bootstrap core CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
@@ -11,7 +11,7 @@
 <div class="container">
 	<div class="py-5 text-center">
 		<h2>FlyDyn</h2>
-		<p class="lead">This program simulates how egg numbers and adult numbers vary across generations in single, isolated populations of common fruitfly <i> Drosophila melanogaster </i> using an individual-based, stage-structured, discrete generation model. A detailed description of the model can be found <a href ="https://doi.org/10.1016/j.jtbi.2018.10.019" target="_blank">here</a>. Click reset and refresh page to start afresh.</p>
+		<p class="lead"> Here we simulate dynamics of single, isolated populations of common fruitfly <i> Drosophila melanogaster </i> using an individual-based, stage-structured, discrete generation <a href ="https://doi.org/10.1016/j.jtbi.2018.10.019" target="_blank">model</a>. Choose your options below to explore how ecological and life-history parameters impact egg number and adult abundance timeseries. Click reset and refresh page to start afresh.</p>
 		
 	</div>
 	<form id="flyndyn_form">
@@ -47,7 +47,7 @@
 				</div>
 			</div>
 		</div>
-		<h4 class="mb-3">Choose a nutitional regime</h4>
+		<h4 class="mb-3">Choose a nutritional regime</h4>
 		<div>
 			<br/>
 		</div>
@@ -100,7 +100,7 @@
 		<div class="row">
 			<div class="col-md-4 mb-3">
 				<div class="form-group">
-					<label>Size and density independent female fecundity index</label>
+					<label>Size and density independent female fecundity</label>
 					<br/>
 					<input type="range" class="custom-range" name="x5" value="85" min="5" max="150" step="1" onchange="rangevalue_x5.value=value"/>
 					<output id="rangevalue_x5">85</output>
@@ -148,8 +148,9 @@
             var form = document.forms.flyndyn_form;
             var details = "Larval Food: " + form.larval_food.value +
                 ";  Adult food: " + form.adult_food.value;
-
-            $('#output').removeClass("d-none").show().prepend('<div><strong>' + details + '</strong><br/><img src="/plotImage?v=' + Math.random() + "&" + $("#flyndyn_form").serialize() + '" /></div><br/><hr/><br/>')
+            var extinct = ""
+			
+            $('#output').removeClass("d-none").show().prepend('<div><strong>' + details + '</strong><br/><p>Timeseries data: [<a href= "/datatable" target="_blank">View</a>] , [<a href= "/timeseries">Download</a>]</p><img src="/plotImage?v=' + Math.random() + "&" + $("#flyndyn_form").serialize() + '" /><br/><p class="lead"><strong>'+extinct +'</strong></p></div><br/><hr/><br/>')
         });
     });
 </script>

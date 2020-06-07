@@ -4,7 +4,8 @@ from flask import Response
 import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
-
+import pandas as pd
+import xlsxwriter
 
 # Main function
 def Egg2Fecund(N_Eggs, LarFood, AdNut, hatchability, Mc, sex_ratio, x5, SenDen, SenSize):
@@ -98,4 +99,22 @@ def graph(NoG, NoR, N_Eggs_init, LarFood, AdNut, hatchability, Mc, sex_ratio, x5
 
     output = io.BytesIO()
     FigureCanvas(fig).print_png(output)
-    return Response(output.getvalue(), mimetype='image/png')
+	
+    output_xl=io.BytesIO()
+    writer = pd.ExcelWriter('temp.xlsx', engine='xlsxwriter')
+    writer.book.filename = output_xl
+    df = pd.DataFrame([[LarFood], [AdNut], [hatchability], [Mc], [sex_ratio], [x5], [SenDen], [SenSize], [''], [NoG], [NoR], [N_Eggs_init]], index =["Larval food", "Adult food", "Egg hatchability", "Larval critical mass", "Proportion of males", "Size and density independent female fecundity", "Sensitivity of female-fecundity to adult density", "Sensitivity of female-fecundity to body-size", "", "No. of generations", "No. of populations", "Initial egg number"], columns = ["values"])
+    df_adult = pd.DataFrame(all_adult, index = ['Pop '+str(i+1) for i in range(NoR)]).transpose()
+    df_egg = pd.DataFrame(all_egg, index = ['Pop '+str(i+1) for i in range(NoR)]).transpose()
+    
+    try:	
+        df.to_excel(writer, sheet_name='Parameter values')
+        df_egg.to_excel(writer, sheet_name='Egg timeseries')
+        df_adult.to_excel(writer, sheet_name='Adult timeseries')
+        writer.save()
+        writer.close()
+    except:
+        pass
+	
+    output_html="<h3> All parameter values </h3>"+"\n"+df.to_html()+"\n"+"<br/><h3> Egg timeseries data</h3>"+"\n"+df_egg.to_html()+"\n"+"<br/><h3> Adult timeseries data</h3>"+"\n"+df_adult.to_html()
+    return (output, output_xl, output_html)
