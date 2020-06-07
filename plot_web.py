@@ -116,5 +116,5 @@ def graph(NoG, NoR, N_Eggs_init, LarFood, AdNut, hatchability, Mc, sex_ratio, x5
     except:
         pass
 	
-    output_html="<h3> All parameter values </h3>"+"\n"+df.to_html()+"\n"+"<br/><h3> Egg timeseries data</h3>"+"\n"+df_egg.to_html()+"\n"+"<br/><h3> Adult timeseries data</h3>"+"\n"+df_adult.to_html()
+    output_html="<h3> All parameter values </h3>"+"\n"+df.to_html(classes=["table table-sm","table-bordered", "table-striped", "table-hover", "col-md-5 mb-3"])+"\n"+"<br/><h3> Egg timeseries data</h3>"+"\n"+df_egg.to_html(classes=["table table-sm","table-bordered", "text-right"])+"\n"+"<br/><h3> Adult timeseries data</h3>"+"\n"+df_adult.to_html(classes=["table table-sm","table-bordered","text-right"])
     return (output, output_xl, output_html)
