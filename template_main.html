@@ -148,9 +148,10 @@
             var form = document.forms.flyndyn_form;
             var details = "Larval Food: " + form.larval_food.value +
                 ";  Adult food: " + form.adult_food.value;
-            var extinct = ""
-			
-            $('#output').removeClass("d-none").show().prepend('<div><strong>' + details + '</strong><br/><p>Timeseries data: [<a href= "/datatable" target="_blank">View</a>] , [<a href= "/timeseries">Download</a>]</p><img src="/plotImage?v=' + Math.random() + "&" + $("#flyndyn_form").serialize() + '" /><br/><p class="lead"><strong>'+extinct +'</strong></p></div><br/><hr/><br/>')
+            var extinct = "";
+            var formValues = encodeURI($("#flyndyn_form").serialize());
+
+            $('#output').removeClass("d-none").show().prepend('<div><strong>' + details + '</strong><br/><p>Timeseries data: [<a href= "/datatable?' + formValues + '" target="_blank">View</a>] , [<a href= "/timeseries?' + formValues + '">Download</a>]</p><img src="/plotImage?v=' + Math.random() + "&" + formValues + '" /><br/><p class="lead"><strong>'+extinct +'</strong></p></div><br/><hr/><br/>')
         });
     });
 </script>
