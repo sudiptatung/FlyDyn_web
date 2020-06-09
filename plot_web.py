@@ -79,7 +79,7 @@ def replicates(LarFood, AdNut, hatchability, Mc, sex_ratio, x5, SenDen, SenSize,
 
 
 # Plotting
-def graph(NoG, NoR, N_Eggs_init, LarFood, AdNut, hatchability, Mc, sex_ratio, x5, SenDen, SenSize):
+def graph(NoG, NoR, N_Eggs_init, LarFood, AdNut, hatchability, Mc, sex_ratio, x5, SenDen, SenSize, outputType):
     [all_Nt , all_Nt1, all_egg_Nt, all_egg_Nt1, all_egg, all_adult, ext_count] = replicates(LarFood, AdNut, hatchability, Mc, sex_ratio, x5, SenDen, SenSize, NoG, NoR, N_Eggs_init)
     fig, axs = plt.subplots(2)
     fig.tight_layout(pad=4.0)
@@ -97,24 +97,36 @@ def graph(NoG, NoR, N_Eggs_init, LarFood, AdNut, hatchability, Mc, sex_ratio, x5
     axs[1].set(xlim = (0,len(time_axis)))
     # plt.show()
 
-    output = io.BytesIO()
-    FigureCanvas(fig).print_png(output)
-	
-    output_xl=io.BytesIO()
-    writer = pd.ExcelWriter('temp.xlsx', engine='xlsxwriter')
-    writer.book.filename = output_xl
-    df = pd.DataFrame([[LarFood], [AdNut], [hatchability], [Mc], [sex_ratio], [x5], [SenDen], [SenSize], [''], [NoG], [NoR], [N_Eggs_init]], index =["Larval food", "Adult food", "Egg hatchability", "Larval critical mass", "Proportion of males", "Size and density independent female fecundity", "Sensitivity of female-fecundity to adult density", "Sensitivity of female-fecundity to body-size", "", "No. of generations", "No. of populations", "Initial egg number"], columns = ["values"])
-    df_adult = pd.DataFrame(all_adult, index = ['Pop '+str(i+1) for i in range(NoR)]).transpose()
-    df_egg = pd.DataFrame(all_egg, index = ['Pop '+str(i+1) for i in range(NoR)]).transpose()
-    
-    try:	
-        df.to_excel(writer, sheet_name='Parameter values')
-        df_egg.to_excel(writer, sheet_name='Egg timeseries')
-        df_adult.to_excel(writer, sheet_name='Adult timeseries')
-        writer.save()
-        writer.close()
-    except:
-        pass
-	
-    output_html="<h3> All parameter values </h3>"+"\n"+df.to_html(classes=["table table-sm","table-bordered", "table-striped", "table-hover", "col-md-5 mb-3"])+"\n"+"<br/><h3> Egg timeseries data</h3>"+"\n"+df_egg.to_html(classes=["table table-sm","table-bordered", "text-right"])+"\n"+"<br/><h3> Adult timeseries data</h3>"+"\n"+df_adult.to_html(classes=["table table-sm","table-bordered","text-right"])
-    return (output, output_xl, output_html)
+    if outputType.lower() == "image":
+        output = io.BytesIO()
+        FigureCanvas(fig).print_png(output)
+        return output
+    else:
+        df = pd.DataFrame([[LarFood], [AdNut], [hatchability], [Mc], [sex_ratio], [x5], [SenDen], [SenSize], [''], [NoG], [NoR], [N_Eggs_init]], index =["Larval food", "Adult food", "Egg hatchability", "Larval critical mass", "Proportion of males", "Size and density independent female fecundity", "Sensitivity of female-fecundity to adult density", "Sensitivity of female-fecundity to body-size", "", "No. of generations", "No. of populations", "Initial egg number"], columns = ["values"])
+        df_adult = pd.DataFrame(all_adult, index = ['Pop '+str(i+1) for i in range(NoR)]).transpose()
+        df_egg = pd.DataFrame(all_egg, index = ['Pop '+str(i+1) for i in range(NoR)]).transpose()
+
+        if outputType.lower() == "html":
+            return "<h3> All parameter values </h3>" \
+                   + df.to_html(classes=["table table-sm", "table-bordered", "table-striped", "table-hover", "col-md-5 mb-3"]) \
+                   + "<br/><h3> Egg timeseries data</h3>" \
+                   + df_egg.to_html(classes=["table table-sm", "table-bordered", "text-right"]) \
+                   + "<br/><h3> Adult timeseries data</h3>" \
+                   + df_adult.to_html(classes=["table table-sm", "table-bordered", "text-right"])
+        elif outputType.lower() == "excel":
+            output_xl = io.BytesIO()
+            writer = pd.ExcelWriter('temp.xlsx', engine='xlsxwriter')
+            writer.book.filename = output_xl
+
+            try:
+                df.to_excel(writer, sheet_name='Parameter values')
+                writer.sheets['Parameter values'].set_column(0, 0, 50)
+
+                df_egg.to_excel(writer, sheet_name='Egg timeseries')
+                df_adult.to_excel(writer, sheet_name='Adult timeseries')
+                writer.save()
+                writer.close()
+            except:
+                pass
+
+            return output_xl
