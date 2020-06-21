@@ -10,7 +10,7 @@ from diskcache import Cache
 from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
 
 # Initialize disk cache, common for all threads
-cache = Cache()
+cache = Cache("cache")
 
 # Main function
 def Egg2Fecund(N_Eggs, LarFood, AdNut, hatchability, Mc, sex_ratio, x5, SenDen, SenSize):
