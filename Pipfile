@@ -23,6 +23,7 @@ MarkupSafe = "==1.1.1"
 Werkzeug = "==1.0.1"
 gunicorn = "*"
 xlsxwriter = "*"
+diskcache = "*"
 
 [requires]
 python_version = "3.7"

@@ -1,11 +1,16 @@
-import random as ran
+import hashlib
 import io
-from flask import Response
+import json
+import random as ran
+
 import matplotlib.pyplot as plt
 import numpy as np
-from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
 import pandas as pd
-import xlsxwriter
+from diskcache import Cache
+from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
+
+# Initialize disk cache, common for all threads
+cache = Cache("cache")
 
 # Main function
 def Egg2Fecund(N_Eggs, LarFood, AdNut, hatchability, Mc, sex_ratio, x5, SenDen, SenSize):
@@ -77,27 +82,52 @@ def replicates(LarFood, AdNut, hatchability, Mc, sex_ratio, x5, SenDen, SenSize,
         ext_count += ext
     return [all_Nt , all_Nt1, all_egg_Nt, all_egg_Nt1, all_egg, all_adult, ext_count]
 
+# Plot data and cache it in disk cache
+def plotAndCache(NoG, NoR, N_Eggs_init, LarFood, AdNut, hatchability, Mc, sex_ratio, x5, SenDen, SenSize):
+    # Plot by calling replicates function
+    [all_Nt , all_Nt1, all_egg_Nt, all_egg_Nt1, all_egg, all_adult, ext_count] = replicates(LarFood, AdNut, hatchability, Mc, sex_ratio, x5, SenDen, SenSize, NoG, NoR, N_Eggs_init)
+
+    # Serialize - aka convert the data into a string format using json (javascript object notation)
+    serializedData = json.dumps([NoG, NoR, N_Eggs_init, LarFood, AdNut, hatchability, Mc, sex_ratio, x5, SenDen, SenSize, all_Nt, all_Nt1, all_egg_Nt, all_egg_Nt1, all_egg, all_adult, ext_count]).encode('utf-8')
+
+    # Generate a unique md5 hash
+    cacheKey = hashlib.md5(serializedData).hexdigest()
+
+    # Store it in the cache, give it a day to expire
+    cache.set(cacheKey, serializedData, expire=60 * 60 * 24, read=True, tag='data')
+
+    # Return the unique cache key will be used by the browser to request for Image/HTML/Excel
+    return cacheKey
 
 # Plotting
-def graph(NoG, NoR, N_Eggs_init, LarFood, AdNut, hatchability, Mc, sex_ratio, x5, SenDen, SenSize, outputType):
-    [all_Nt , all_Nt1, all_egg_Nt, all_egg_Nt1, all_egg, all_adult, ext_count] = replicates(LarFood, AdNut, hatchability, Mc, sex_ratio, x5, SenDen, SenSize, NoG, NoR, N_Eggs_init)
-    fig, axs = plt.subplots(2)
-    fig.tight_layout(pad=4.0)
-    for i in range (len(all_egg)):
-        time_axis = list(range(len(all_egg[0])))
-        axs[0].plot(time_axis, all_egg[i], linewidth=1)
-    axs[0].set_title("Egg timeseries")
-    axs[0].set(xlabel = "Generations", ylabel = "Number of eggs")
-    axs[0].set(xlim = (0,len(time_axis)))
-    for i in range (len(all_adult)):
-        time_axis = list(range(len(all_adult[0])))
-        axs[1].plot(time_axis, all_adult[i], linewidth=1)
-    axs[1].set_title("Adult timeseries")
-    axs[1].set(xlabel = "Generations", ylabel = "Population size")
-    axs[1].set(xlim = (0,len(time_axis)))
-    # plt.show()
+def graph(cacheKey, outputType):
+    # Retrive from the cache
+    storedData = cache.get(cacheKey)
+    if storedData is None:
+        return None
 
+    [NoG, NoR, N_Eggs_init, LarFood, AdNut, hatchability, Mc, sex_ratio, x5, SenDen, SenSize, all_Nt, all_Nt1, all_egg_Nt, all_egg_Nt1, all_egg, all_adult, ext_count] = json.loads(storedData)
+
+    # Display the output based on request
     if outputType.lower() == "image":
+
+        # Image - plot using matplotlib and generate p
+        fig, axs = plt.subplots(2)
+        fig.tight_layout(pad=4.0)
+        for i in range(len(all_egg)):
+            time_axis = list(range(len(all_egg[0])))
+            axs[0].plot(time_axis, all_egg[i], linewidth=1)
+        axs[0].set_title("Egg timeseries")
+        axs[0].set(xlabel="Generations", ylabel="Number of eggs")
+        axs[0].set(xlim=(0, len(time_axis)))
+        for i in range(len(all_adult)):
+            time_axis = list(range(len(all_adult[0])))
+            axs[1].plot(time_axis, all_adult[i], linewidth=1)
+        axs[1].set_title("Adult timeseries")
+        axs[1].set(xlabel="Generations", ylabel="Population size")
+        axs[1].set(xlim=(0, len(time_axis)))
+        plt.show()
+
         output = io.BytesIO()
         FigureCanvas(fig).print_png(output)
         return output
